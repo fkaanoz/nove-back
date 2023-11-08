@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	confkafka "github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
 
 // subscribed topics.
@@ -11,7 +11,7 @@ const (
 )
 
 type MessageHandler interface {
-	HandleMessage(msg *confkafka.Message) error
+	HandleMessage(msg *kafka.Message) error
 }
 
 var TopicMap = map[string]MessageHandler{
