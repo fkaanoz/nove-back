@@ -28,7 +28,7 @@ func v1(app *web.App) *web.App {
 
 	userHandlers := usergrp.UserGrp{Redis: app.Redis, Logger: app.Logger, Core: &core.UserCore{DB: app.DB}}
 
-	app.Handle(http.MethodGet, "/:id", userHandlers.UserByID)
+	app.Handle(http.MethodGet, "/user-by-id/:id", userHandlers.UserByID)
 	app.Handle(http.MethodPost, "/by-name", userHandlers.UserByName)
 	app.Handle(http.MethodGet, "/by-email", userHandlers.UserByEmail)
 
