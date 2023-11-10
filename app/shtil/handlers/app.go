@@ -3,8 +3,8 @@ package handlers
 import (
 	"github.com/dimfeld/httptreemux/v5"
 	"net/http"
+	"shtil/app/shtil/handlers/errgrp"
 	"shtil/app/shtil/handlers/kafkagrp"
-	"shtil/app/shtil/handlers/testgrp"
 	"shtil/app/shtil/handlers/usergrp"
 	"shtil/business/mids"
 	"shtil/business/store/core"
@@ -36,7 +36,7 @@ func v1(app *web.App) *web.App {
 	app.Handle(http.MethodGet, "/kafka", kafkagrp.Queue)
 
 	// health check - go-api
-	app.Handle(http.MethodGet, "/go-api/panic", testgrp.HealthCheck)
+	app.Handle(http.MethodGet, "/go-api/panic", errgrp.PanicSimulation)
 
 	return app
 }
