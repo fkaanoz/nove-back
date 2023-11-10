@@ -36,7 +36,7 @@ func v1(app *web.App) *web.App {
 	app.Handle(http.MethodGet, "/kafka", kafkagrp.Queue)
 
 	// health check - go-api
-	app.Handle(http.MethodGet, "/go-api", testgrp.HealthCheck)
+	app.Handle(http.MethodGet, "/go-api/panic", testgrp.HealthCheck)
 
 	return app
 }
