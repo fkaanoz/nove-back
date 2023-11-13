@@ -28,21 +28,21 @@ func NewApp(appConfig *web.AppConfig) *web.App {
 func v1(app *web.App) *web.App {
 
 	// health check
-	app.Handle(http.MethodGet, "/go-api/health-check", system.HealthCheck)
+	app.Handle(http.MethodGet, "/api/health-check", system.HealthCheck)
 
 	// user handlers
 	userHandlers := usergrp.UserGrp{Redis: app.Redis, Logger: app.Logger, Core: &core.UserCore{DB: app.DB}}
-	app.Handle(http.MethodGet, "/go-api/user-by-id/:id", userHandlers.UserByID)
-	app.Handle(http.MethodPost, "/go-api/by-name", userHandlers.UserByName)
-	app.Handle(http.MethodGet, "/go-api/by-email", userHandlers.UserByEmail)
+	app.Handle(http.MethodGet, "/api/user-by-id/:id", userHandlers.UserByID)
+	app.Handle(http.MethodPost, "/api/by-name", userHandlers.UserByName)
+	app.Handle(http.MethodGet, "/api/by-email", userHandlers.UserByEmail)
 
 	// order handlers
 	orderHandlers := ordergrp.OrderGrp{Logger: app.Logger, Core: &core.OrderCore{DB: app.DB}}
-	app.Handle(http.MethodGet, "/go-api/last-20-orders", orderHandlers.Last20Orders)
+	app.Handle(http.MethodGet, "/api/last-20-orders", orderHandlers.Last20Orders)
 
 	// transaction handlers
 	transactionHandlers := transactiongrp.TransactionGrp{Core: &core.TransactionCore{DB: app.DB}}
-	app.Handle(http.MethodGet, "/go-api/tx/:id", transactionHandlers.GetByID)
+	app.Handle(http.MethodGet, "/api/tx/:id", transactionHandlers.GetByID)
 
 	return app
 }
