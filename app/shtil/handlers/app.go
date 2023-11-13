@@ -3,8 +3,9 @@ package handlers
 import (
 	"github.com/dimfeld/httptreemux/v5"
 	"net/http"
-	"shtil/app/shtil/handlers/errgrp"
-	"shtil/app/shtil/handlers/kafkagrp"
+	"shtil/app/shtil/handlers/ordergrp"
+	"shtil/app/shtil/handlers/system"
+	"shtil/app/shtil/handlers/transactiongrp"
 	"shtil/app/shtil/handlers/usergrp"
 	"shtil/business/mids"
 	"shtil/business/store/core"
@@ -26,17 +27,22 @@ func NewApp(appConfig *web.AppConfig) *web.App {
 
 func v1(app *web.App) *web.App {
 
+	// health check
+	app.Handle(http.MethodGet, "/go-api/health-check", system.HealthCheck)
+
+	// user handlers
 	userHandlers := usergrp.UserGrp{Redis: app.Redis, Logger: app.Logger, Core: &core.UserCore{DB: app.DB}}
+	app.Handle(http.MethodGet, "/go-api/user-by-id/:id", userHandlers.UserByID)
+	app.Handle(http.MethodPost, "/go-api/by-name", userHandlers.UserByName)
+	app.Handle(http.MethodGet, "/go-api/by-email", userHandlers.UserByEmail)
 
-	app.Handle(http.MethodGet, "/user-by-id/:id", userHandlers.UserByID)
-	app.Handle(http.MethodPost, "/by-name", userHandlers.UserByName)
-	app.Handle(http.MethodGet, "/by-email", userHandlers.UserByEmail)
+	// order handlers
+	orderHandlers := ordergrp.OrderGrp{Logger: app.Logger, Core: &core.OrderCore{DB: app.DB}}
+	app.Handle(http.MethodGet, "/go-api/last-20-orders", orderHandlers.Last20Orders)
 
-	// kafka
-	app.Handle(http.MethodGet, "/kafka", kafkagrp.Queue)
-
-	// health check - go-api
-	app.Handle(http.MethodGet, "/go-api/panic", errgrp.PanicSimulation)
+	// transaction handlers
+	transactionHandlers := transactiongrp.TransactionGrp{Core: &core.TransactionCore{DB: app.DB}}
+	app.Handle(http.MethodGet, "/go-api/tx/:id", transactionHandlers.GetByID)
 
 	return app
 }

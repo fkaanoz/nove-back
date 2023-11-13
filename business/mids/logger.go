@@ -20,7 +20,7 @@ func Logger(log *zap.SugaredLogger) web.Middleware {
 				return err
 			}
 
-			log.Errorw("REQUEST", "status", "successful", "traceID", web.GetTraceID(ctx))
+			log.Infow("REQUEST", "status", "successful", "traceID", web.GetTraceID(ctx))
 			return nil
 		}
 
