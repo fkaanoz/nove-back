@@ -4,7 +4,7 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
 
-// subscribed topics.
+// subscribed topics. This should not be here. For sake of easiness, it is configured in here.
 const (
 	TestTopic    = "test-topic"
 	AnotherTopic = "another-topic"

@@ -13,5 +13,3 @@ func (t TestTpc) HandleMessage(msg *kafka.Message) error {
 	fmt.Println("test-topic", string(msg.Value))
 	return nil
 }
-
-// write a committer.

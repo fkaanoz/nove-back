@@ -27,7 +27,7 @@ func NewApp(appConfig *web.AppConfig) *web.App {
 
 func v1(app *web.App) *web.App {
 
-	// health check
+	// health check for load balancer or k8s
 	app.Handle(http.MethodGet, "/api/health-check", system.HealthCheck)
 
 	// user handlers

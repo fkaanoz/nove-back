@@ -12,9 +12,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"shtil/app/debug"
 	ckafka "shtil/app/kafka"
 	credis "shtil/app/redis"
-	"shtil/app/shtil/debug"
 	"shtil/app/shtil/handlers"
 	bkafka "shtil/business/kafka"
 	"shtil/business/logger"
@@ -23,6 +23,9 @@ import (
 	"syscall"
 	"time"
 )
+
+// Set these values while you are building docker images. ( -ldflags = "-X 'main.Service=shtil'" )
+// Also revision can be added. (with -ldflags = "-X 'main.revision=`git rev-parse --short=8 HEAD`'" )
 
 var Service = "sthil"
 var ServiceVersion = "v1.0.0"
@@ -35,13 +38,13 @@ func main() {
 	}
 
 	if err := run(zlog); err != nil {
-		zlog.Errorw("RUN_ERROR", "ERROR", err)
+		zlog.Errorw("RUN", "ERROR", err)
 	}
 }
 
 func run(log *zap.SugaredLogger) error {
 
-	// init config
+	// init configurations
 	cfg := struct {
 		conf.Version
 		Web struct {
@@ -77,7 +80,7 @@ func run(log *zap.SugaredLogger) error {
 	}{
 		Version: conf.Version{
 			Build: BUILD,
-			Desc:  "sthil for test",
+			Desc:  "sthil for dev build",
 		},
 	}
 
@@ -93,7 +96,7 @@ func run(log *zap.SugaredLogger) error {
 
 	serverCh := make(chan error, 1)
 	shutdownCh := make(chan os.Signal)
-	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM) // alternative is signal.NotifyContext with ErrorGroup (in sync package) package.
 
 	// redis
 	redisOptions := &redis.Options{
@@ -109,7 +112,7 @@ func run(log *zap.SugaredLogger) error {
 		Password:    cfg.DB.Password,
 		Host:        cfg.DB.Host,
 		Database:    cfg.DB.Database,
-		SSLRequire:  false,
+		SSLRequire:  false, // for development purposes
 		Timezone:    "Europe/Istanbul",
 		MaxIdleConn: cfg.DB.MaxIdleConn,
 		MaxOpenConn: cfg.DB.MaxOpenConn,
@@ -137,8 +140,8 @@ func run(log *zap.SugaredLogger) error {
 	go func() {
 		log.Infow("DEBUG", "status", "started", "port", cfg.Debug.Addr)
 		defer log.Infow("DEBUG", "status", "stopped", "port", cfg.Debug.Addr)
-		if err := http.ListenAndServe(cfg.Debug.Addr, debug.DebugApi()); err != nil {
-			fmt.Println("debug api err : ", err)
+		if err := http.ListenAndServe(cfg.Debug.Addr, debug.Mux()); err != nil {
+			log.Errorw("DEBUG", "ERROR", err)
 		}
 	}()
 
@@ -152,11 +155,11 @@ func run(log *zap.SugaredLogger) error {
 	consumer, err := ckafka.NewKafkaConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  cfg.Kafka.BootstrapServers,
 		"group.id":           cfg.Kafka.GroupID,
-		"enable.auto.commit": cfg.Kafka.AutoCommit,
+		"enable.auto.commit": cfg.Kafka.AutoCommit, // manuel committing intentionally.
 		"auto.offset.reset":  cfg.Kafka.AutoOffsetReset,
 	}, log, []string{bkafka.TestTopic, bkafka.AnotherTopic})
 
-	//  TODO : TOPIC LIST SHOULD NOT BE A SLICE. CREATE STRUCTS PER TOPICS AND HANDLERS.
+	//  TODO : TOPIC LIST SHOULD NOT BE A SLICE. It should be something configurable also, it has mux-like nature.
 
 	go func() {
 		log.Infow("KAFKA", "status", "listening")
@@ -181,8 +184,4 @@ func run(log *zap.SugaredLogger) error {
 	}
 
 	return nil
-}
-
-func subscribe() []string {
-	return []string{"test-topic"}
 }

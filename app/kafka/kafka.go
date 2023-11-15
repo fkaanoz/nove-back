@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"fmt"
 	rkafka "github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"go.uber.org/zap"
 	"shtil/business/kafka"
@@ -44,22 +43,21 @@ func (c *CustomConsumer) Run() {
 			case kafka.TestTopic:
 				err := kafka.TopicMap[kafka.TestTopic].HandleMessage(e)
 				if err == nil {
-					fmt.Println("committing tp")
 					c.Commit()
 				}
 
 			case kafka.AnotherTopic:
 				err := kafka.TopicMap[kafka.AnotherTopic].HandleMessage(e)
 				if err == nil {
-					fmt.Println("committing ap")
 					c.Commit()
 				}
 			}
 		case rkafka.PartitionEOF:
-			fmt.Println("EOF")
+			c.Logger.Errorw("KAFKA", "Message_Read_Error", e.Error)
 		case rkafka.Error:
-			fmt.Println("ERROR", e)
+			c.Logger.Errorw("KAFKA", "Message_Read_Error", e.Error)
 		default:
+			c.Logger.Errorw("KAFKA", "Message_Read_Error", "unknown")
 		}
 	}
 }

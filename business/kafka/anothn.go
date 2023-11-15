@@ -21,5 +21,3 @@ func (t AnotherTpc) HandleMessage(msg *kafka.Message) error {
 
 	return nil
 }
-
-// write a committer.

@@ -31,10 +31,10 @@ type App struct {
 
 func (a *App) Handle(method string, path string, handler Handler, middlewares ...Middleware) {
 
-	// wrap with application middlewares
+	// wrap with application wise middlewares
 	handler = wrapMiddlewares(handler, a.Middlewares...)
 
-	// wrap with handler middlewares
+	// wrap with handler specific middlewares
 	handler = wrapMiddlewares(handler, middlewares...)
 
 	h := func(w http.ResponseWriter, r *http.Request) {

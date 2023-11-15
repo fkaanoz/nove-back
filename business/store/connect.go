@@ -24,7 +24,7 @@ func Connect(config DBConfig) (*sqlx.DB, error) {
 		sslmode = "disable"
 	}
 
-	//example connection string ->  postgresql://username:password@198.51.100.22:3333/sales?connect_timeout=10&sslmode=require&target_session_attrs=primary
+	// example connection string ->  postgresql://username:password@198.51.100.22:3333/sales?connect_timeout=10&sslmode=require&target_session_attrs=primary
 	connStr := url.URL{
 		Scheme:   "postgres",
 		User:     url.UserPassword(config.Username, config.Password),
