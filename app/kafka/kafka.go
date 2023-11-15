@@ -55,7 +55,7 @@ func (c *CustomConsumer) Run() {
 		case rkafka.PartitionEOF:
 			c.Logger.Errorw("KAFKA", "Message_Read_Error", e.Error)
 		case rkafka.Error:
-			c.Logger.Errorw("KAFKA", "Message_Read_Error", e.Error)
+			c.Logger.Errorw("KAFKA", "Kafka Error", e.Error())
 		default:
 		}
 	}
