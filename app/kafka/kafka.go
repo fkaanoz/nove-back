@@ -57,7 +57,6 @@ func (c *CustomConsumer) Run() {
 		case rkafka.Error:
 			c.Logger.Errorw("KAFKA", "Message_Read_Error", e.Error)
 		default:
-			c.Logger.Errorw("KAFKA", "Message_Read_Error", "unknown")
 		}
 	}
 }
