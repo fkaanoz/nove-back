@@ -12,12 +12,14 @@ import (
 
 type Handler func(context.Context, http.ResponseWriter, *http.Request) error
 
-// AppConfig should be implemented to reduce parameter count of NewApp constructor.
+// TODO : include auth package in AppConfig.
+
 type AppConfig struct {
 	Logger      *zap.SugaredLogger
 	Redis       *credis.Redis
 	DB          *sqlx.DB
 	ServerErrCh chan error
+	Auth        *Auth
 }
 
 type App struct {
@@ -27,15 +29,16 @@ type App struct {
 	Middlewares []Middleware
 	Redis       *credis.Redis
 	DB          *sqlx.DB
+	Auth        *Auth
 }
 
 func (a *App) Handle(method string, path string, handler Handler, middlewares ...Middleware) {
 
-	// wrap with application wise middlewares
-	handler = wrapMiddlewares(handler, a.Middlewares...)
-
 	// wrap with handler specific middlewares
 	handler = wrapMiddlewares(handler, middlewares...)
+
+	// wrap with application wise middlewares
+	handler = wrapMiddlewares(handler, a.Middlewares...)
 
 	h := func(w http.ResponseWriter, r *http.Request) {
 

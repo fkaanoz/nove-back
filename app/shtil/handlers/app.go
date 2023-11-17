@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/dimfeld/httptreemux/v5"
 	"net/http"
+	"shtil/app/shtil/handlers/logingrp"
 	"shtil/app/shtil/handlers/ordergrp"
 	"shtil/app/shtil/handlers/system"
 	"shtil/app/shtil/handlers/transactiongrp"
@@ -20,6 +21,7 @@ func NewApp(appConfig *web.AppConfig) *web.App {
 		Middlewares: []web.Middleware{mids.Panic(), mids.Logger(appConfig.Logger), mids.Error()},
 		Redis:       appConfig.Redis,
 		DB:          appConfig.DB,
+		Auth:        appConfig.Auth,
 	}
 
 	return v1(app)
@@ -31,8 +33,8 @@ func v1(app *web.App) *web.App {
 	app.Handle(http.MethodGet, "/api/health-check", system.HealthCheck)
 
 	// user handlers
-	userHandlers := usergrp.UserGrp{Redis: app.Redis, Logger: app.Logger, Core: &core.UserCore{DB: app.DB}}
-	app.Handle(http.MethodGet, "/api/user-by-id/:id", userHandlers.UserByID)
+	userHandlers := usergrp.UserGrp{Redis: app.Redis, Logger: app.Logger, Core: &core.UserCore{DB: app.DB}, Auth: app.Auth}
+	app.Handle(http.MethodGet, "/api/user-by-id/:id", userHandlers.UserByID, mids.Auth(app.Auth))
 	app.Handle(http.MethodPost, "/api/by-name", userHandlers.UserByName)
 	app.Handle(http.MethodGet, "/api/by-email", userHandlers.UserByEmail)
 
@@ -43,6 +45,11 @@ func v1(app *web.App) *web.App {
 	// transaction handlers
 	transactionHandlers := transactiongrp.TransactionGrp{Core: &core.TransactionCore{DB: app.DB}}
 	app.Handle(http.MethodGet, "/api/tx/:id", transactionHandlers.GetByID)
+
+	// login handlers
+	loginHandlers := logingrp.LoginGrp{Core: core.LoginCore{DB: app.DB}, Auth: app.Auth}
+	app.Handle(http.MethodPost, "/api/register", loginHandlers.Register)
+	app.Handle(http.MethodPost, "/api/login", loginHandlers.Login)
 
 	return app
 }

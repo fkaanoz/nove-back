@@ -17,6 +17,7 @@ import (
 	credis "shtil/app/redis"
 	"shtil/app/shtil/handlers"
 	bkafka "shtil/business/kafka"
+	"shtil/business/keystore"
 	"shtil/business/logger"
 	"shtil/business/store"
 	"shtil/foundation/web"
@@ -62,6 +63,10 @@ func run(log *zap.SugaredLogger) error {
 			GroupID          string `conf:"default:test-group"`
 			AutoCommit       bool   `conf:"default:false"`
 			AutoOffsetReset  string `conf:"default:earliest"`
+		}
+		Auth struct {
+			KeysFolder string `conf:"default:/Users/fkaanoz/Desktop/dev/nove/back/zarf/keys"`
+			ActiveKid  string `conf:"default:test"`
 		}
 		Socket struct{}
 		Redis  struct {
@@ -123,6 +128,11 @@ func run(log *zap.SugaredLogger) error {
 		return err
 	}
 
+	keyStore, err := keystore.NewFS(os.DirFS(cfg.Auth.KeysFolder))
+	if err != nil {
+		return err
+	}
+
 	api := http.Server{
 		Addr: cfg.Web.Addr,
 		Handler: handlers.NewApp(&web.AppConfig{
@@ -130,6 +140,12 @@ func run(log *zap.SugaredLogger) error {
 			Redis:       redisClient,
 			DB:          conn,
 			ServerErrCh: serverCh,
+			Auth: &web.Auth{
+				KeyFolder: cfg.Auth.KeysFolder,
+				ActiveKid: cfg.Auth.ActiveKid,
+				KeyStore:  keyStore,
+				KeyFunc:   keyStore.InMemKeyFunc,
+			},
 		}),
 		ReadTimeout:  cfg.Web.ReadTimeout,
 		WriteTimeout: cfg.Web.WriteTimeout,

@@ -18,9 +18,16 @@ type UserGrp struct {
 	Redis  *credis.Redis
 	Logger *zap.SugaredLogger
 	Core   *core.UserCore
+	Auth   *web.Auth
 }
 
 func (ug *UserGrp) UserByID(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+
+	// check token and return for test
+	//
+	//valid := ug.Auth.ValidateToken(r.Header.Get("token"))
+	//fmt.Print("token validation ")
+
 	urlParams := httptreemux.ContextData(r.Context()).Params()
 	userID, ok := urlParams["id"]
 	if !ok {
