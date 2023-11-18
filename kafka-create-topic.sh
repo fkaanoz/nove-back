@@ -1,0 +1,2 @@
+/Users/fkaanoz/Desktop/kafka/bin/kafka-topics.sh --bootstrap-server=localhost:9092 --replication-factor=3 --partitions=3 --create --topic test-topic &
+/Users/fkaanoz/Desktop/kafka/bin/kafka-topics.sh --bootstrap-server=localhost:9092 --replication-factor=3 --partitions=3--create --topic another-topic
