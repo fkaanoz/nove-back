@@ -31,9 +31,13 @@ Some Packages:
 - confluentinc/confluent-kafka-go for connecting to kafka.
 - redis/go-redis for connecting to redis server.
 
-## Notes:
+## Other Notes:
 - Repository will be refactored. It is not its eventual state.  
-- pem files are added intentionally. 
+- pem files are added intentionally.
+- **Commits are not too much tidy.** They are done when both frontend and backend are deployed to Azure.
+  - It has a basic frontend which is written in Next.js to simulate project's distributed nature.
+  - **Static pages are served with Next.js app and api requests are directed to Go Service by simple nginx configuration.**
+  
 
 ### Error in Build Stage (for darwin):
 - confluent kafka package needs CGO_ENABLED for build process. However golang image for Darwin encounters a problem related with gcc. When you build the eventual image in an Ubuntu Server, problem disappear.
