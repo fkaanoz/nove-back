@@ -1,7 +1,7 @@
 package web
 
 import (
-	"fmt"
+	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"shtil/business/keystore"
 	"time"
@@ -14,6 +14,7 @@ type Auth struct {
 	ActiveKid string
 	KeyStore  *keystore.KeyStore
 	KeyFunc   KeyFunc
+	ApiToken  string
 }
 
 func (a *Auth) GenerateToken(hour int) (string, error) {
@@ -26,14 +27,12 @@ func (a *Auth) GenerateToken(hour int) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	token.Header["activeKid"] = a.ActiveKid
+	token.Header["kid"] = a.ActiveKid
 
 	key, err := a.KeyStore.PrivateKey(a.ActiveKid)
 	if err != nil {
 		return "", err
 	}
-
-	fmt.Println("3")
 
 	signedToken, err := token.SignedString(key)
 	if err != nil {
@@ -43,12 +42,16 @@ func (a *Auth) GenerateToken(hour int) (string, error) {
 	return signedToken, nil
 }
 
-func (a *Auth) ValidateToken(token string) bool {
+func (a *Auth) ValidateToken(token string) error {
 	parsedToken, err := jwt.Parse(token, jwt.Keyfunc(a.KeyFunc))
 	if err != nil {
-		fmt.Print("parser error", err)
-		return false
+		return err
+
 	}
 
-	return parsedToken.Valid
+	if !parsedToken.Valid {
+		return errors.New("token is not valid")
+	}
+
+	return nil
 }

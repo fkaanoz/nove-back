@@ -30,21 +30,21 @@ func NewApp(appConfig *web.AppConfig) *web.App {
 func v1(app *web.App) *web.App {
 
 	// health check for load balancer or k8s
-	app.Handle(http.MethodGet, "/api/health-check", system.HealthCheck)
+	app.Handle(http.MethodGet, "/api/health-check", system.HealthCheck, mids.ApiToken(app.Auth.ApiToken))
 
 	// user handlers
 	userHandlers := usergrp.UserGrp{Redis: app.Redis, Logger: app.Logger, Core: &core.UserCore{DB: app.DB}, Auth: app.Auth}
 	app.Handle(http.MethodGet, "/api/user-by-id/:id", userHandlers.UserByID, mids.Auth(app.Auth))
-	app.Handle(http.MethodPost, "/api/by-name", userHandlers.UserByName)
-	app.Handle(http.MethodGet, "/api/by-email", userHandlers.UserByEmail)
+	app.Handle(http.MethodPost, "/api/by-name", userHandlers.UserByName, mids.Auth(app.Auth))
+	app.Handle(http.MethodGet, "/api/by-email", userHandlers.UserByEmail, mids.Auth(app.Auth))
 
 	// order handlers
 	orderHandlers := ordergrp.OrderGrp{Logger: app.Logger, Core: &core.OrderCore{DB: app.DB}}
-	app.Handle(http.MethodGet, "/api/last-20-orders", orderHandlers.Last20Orders)
+	app.Handle(http.MethodGet, "/api/last-20-orders", orderHandlers.Last20Orders, mids.Auth(app.Auth))
 
 	// transaction handlers
 	transactionHandlers := transactiongrp.TransactionGrp{Core: &core.TransactionCore{DB: app.DB}}
-	app.Handle(http.MethodGet, "/api/tx/:id", transactionHandlers.GetByID)
+	app.Handle(http.MethodGet, "/api/tx/:id", transactionHandlers.GetByID, mids.Auth(app.Auth))
 
 	// login handlers
 	loginHandlers := logingrp.LoginGrp{Core: core.LoginCore{DB: app.DB}, Auth: app.Auth}

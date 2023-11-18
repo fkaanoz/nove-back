@@ -67,6 +67,7 @@ func run(log *zap.SugaredLogger) error {
 		Auth struct {
 			KeysFolder string `conf:"default:/Users/fkaanoz/Desktop/dev/nove/back/zarf/keys"`
 			ActiveKid  string `conf:"default:test"`
+			ApiToken   string `conf:"default:c6d6ecc2a97a2f84339225b1c2bfd437935fa4607beb144e7819a7f0681efd48"` // It is used for health check endpoint. Password is created with /dev/urandom. (command in makefile)
 		}
 		Socket struct{}
 		Redis  struct {
@@ -145,6 +146,7 @@ func run(log *zap.SugaredLogger) error {
 				ActiveKid: cfg.Auth.ActiveKid,
 				KeyStore:  keyStore,
 				KeyFunc:   keyStore.InMemKeyFunc,
+				ApiToken:  cfg.Auth.ApiToken,
 			},
 		}),
 		ReadTimeout:  cfg.Web.ReadTimeout,
