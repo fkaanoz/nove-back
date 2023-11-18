@@ -1,9 +1,5 @@
 ## TODO
-- Reverse the middleware order.
 - Redis Client should be implemented.
-- Auth middleware. Both middleware and auth package in foundation is empty. 
-
-
 
 - Errors from API should be handled in Frontend with toasters or something like that.  - 10th Nov.
 
