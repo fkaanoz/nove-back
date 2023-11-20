@@ -16,6 +16,7 @@ import (
 	ckafka "shtil/app/kafka"
 	credis "shtil/app/redis"
 	"shtil/app/shtil/handlers"
+	"shtil/app/socket"
 	bkafka "shtil/business/kafka"
 	"shtil/business/keystore"
 	"shtil/business/logger"
@@ -69,8 +70,12 @@ func run(log *zap.SugaredLogger) error {
 			ActiveKid  string `conf:"default:test"`
 			ApiToken   string `conf:"default:c6d6ecc2a97a2f84339225b1c2bfd437935fa4607beb144e7819a7f0681efd48"` // It is used for health check endpoint. Password is created with /dev/urandom. (command in makefile)
 		}
-		Socket struct{}
-		Redis  struct {
+		Socket struct {
+			Addr         string        `conf:"default:0.0.0.0:5500"`
+			ReadTimeout  time.Duration `conf:"default:20s"`
+			WriteTimeout time.Duration `conf:"default:20s"`
+		}
+		Redis struct {
 			Addr     string `conf:"default:0.0.0.0:6379"`
 			Password string `conf:"default:''"`
 			DB       int    `conf:"default:0"`
@@ -167,6 +172,20 @@ func run(log *zap.SugaredLogger) error {
 	go func() {
 		log.Infow("API", "status", "started", "port", cfg.Web.Addr)
 		serverCh <- api.ListenAndServe()
+	}()
+
+	s := socket.Server{
+		Addr:         cfg.Socket.Addr,
+		ReadTimeout:  cfg.Socket.ReadTimeout,
+		WriteTimeout: cfg.Socket.WriteTimeout}
+
+	// socket server
+	go func() {
+		log.Infow("SOCKET", "status", "starting...", "port", cfg.Socket.Addr)
+		err := s.Run()
+		if err != nil {
+			log.Errorw("SOCKET", "ERR", err)
+		}
 	}()
 
 	// kafka

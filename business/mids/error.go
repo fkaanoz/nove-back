@@ -26,11 +26,18 @@ func Error() web.Middleware {
 						Fields: act.Fields,
 						Reason: "bad request",
 					}
+				case validate.NotFoundError:
+					status = http.StatusNotFound
+					er = validate.ErrorResponse{
+						Error:  act.Message,
+						Fields: nil,
+						Reason: "not found",
+					}
 				default:
 					status = http.StatusInternalServerError
 					er = validate.ErrorResponse{
 						Error:  act.Error(),
-						Fields: []string{"test-field"},
+						Fields: nil,
 						Reason: "internal service error",
 					}
 				}

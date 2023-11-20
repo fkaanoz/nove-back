@@ -17,11 +17,12 @@ func (re RequestError) Error() string {
 	return re.Err.Error()
 }
 
-func NewRequestError(err error, fields []string) *RequestError {
-	return &RequestError{
-		Err:    err,
-		Fields: fields,
-	}
+type NotFoundError struct {
+	Message string
+}
+
+func (n NotFoundError) Error() string {
+	return n.Message
 }
 
 // Cause finds the root of the provided error.

@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	credis "shtil/app/redis"
+	"shtil/business/validate"
 )
 
 type Handler func(context.Context, http.ResponseWriter, *http.Request) error
@@ -49,6 +50,11 @@ func (a *App) Handle(method string, path string, handler Handler, middlewares ..
 		if err := handler(ctx, w, r); err != nil {
 			a.ServerErrCh <- err
 		}
+	}
+
+	notFound := validate.NotFoundError{Message: "resource not found"}
+	a.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
+		Respond(w, notFound, http.StatusNotFound)
 	}
 
 	a.ContextMux.Handle(method, path, h)
