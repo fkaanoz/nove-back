@@ -3,6 +3,7 @@ package mids
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"shtil/business/validate"
 	"shtil/foundation/web"
@@ -14,8 +15,10 @@ func ApiToken(token string) web.Middleware {
 	m := func(handler web.Handler) web.Handler {
 
 		h := func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+			fmt.Println("TOKEN ", r.Header.Get("Api-Token"))
+			fmt.Println("normal token", token)
 
-			if token != r.Header.Get("ApiToken") {
+			if token != r.Header.Get("Api-Token") {
 				return validate.RequestError{
 					Err:    errors.New("invalid api token"),
 					Fields: nil,
