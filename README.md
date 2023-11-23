@@ -44,6 +44,7 @@ Some Packages:
 
 
 ## Cloc
+**Note** : Vendor directory excluded.
 
 Language|files|blank|comment|code
 :-------|-------:|-------:|-------:|-------:
