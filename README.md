@@ -41,3 +41,21 @@ Some Packages:
 
 ### Error in Build Stage (for darwin):
 - confluent kafka package needs CGO_ENABLED for build process. However golang image for Darwin encounters a problem related with gcc. When you build the eventual image in an Ubuntu Server, problem disappear.
+
+
+## Cloc
+
+Language|files|blank|comment|code
+:-------|-------:|-------:|-------:|-------:
+Go|46|345|48|1470
+XML|7|0|0|144
+Markdown|1|4|0|39
+Bourne Shell|3|9|0|12
+make|1|8|0|11
+Dockerfile|1|4|0|7
+--------|--------|--------|--------|--------
+SUM:|59|370|48|1683
+
+
+cloc|github.com/AlDanial/cloc v 1.96  T=0.02 s (2681.1 files/s, 95473.8 lines/s)
+--- | ---
